@@ -1,3 +1,4 @@
+
 -- Date dimension shared by DOT 311 service requests and DOB NOW job filings
 
 -- Build initial CTEs for Jinja syntax to make refs to staging models easier
@@ -13,44 +14,44 @@ stg_dob AS (
 all_dates AS (
 
     -- 311 service requests: date roles referenced by fact_311_service_request
-    SELECT DISTINCT CAST(created_date AS DATE) AS full_date
+    SELECT DISTINCT DATE(SAFE_CAST(created_date AS TIMESTAMP)) AS full_date
     FROM stg_311
     WHERE created_date IS NOT NULL
 
     UNION DISTINCT
 
-    SELECT DISTINCT CAST(closed_date AS DATE) AS full_date
+    SELECT DISTINCT DATE(SAFE_CAST(closed_date AS TIMESTAMP)) AS full_date
     FROM stg_311
     WHERE closed_date IS NOT NULL
 
     UNION DISTINCT
 
     -- DOB NOW job filings: date roles referenced by fact_dob_job_filing
-    SELECT DISTINCT CAST(filing_date AS DATE) AS full_date
+    SELECT DISTINCT DATE(SAFE_CAST(filing_date AS TIMESTAMP)) AS full_date
     FROM stg_dob
     WHERE filing_date IS NOT NULL
 
     UNION DISTINCT
 
-    SELECT DISTINCT CAST(current_status_date AS DATE) AS full_date
+    SELECT DISTINCT DATE(SAFE_CAST(current_status_date AS TIMESTAMP)) AS full_date
     FROM stg_dob
     WHERE current_status_date IS NOT NULL
 
     UNION DISTINCT
 
-    SELECT DISTINCT CAST(first_permit_date AS DATE) AS full_date
+    SELECT DISTINCT DATE(SAFE_CAST(first_permit_date AS TIMESTAMP)) AS full_date
     FROM stg_dob
     WHERE first_permit_date IS NOT NULL
 
     UNION DISTINCT
 
-    SELECT DISTINCT CAST(approved_date AS DATE) AS full_date
+    SELECT DISTINCT DATE(SAFE_CAST(approved_date AS TIMESTAMP)) AS full_date
     FROM stg_dob
     WHERE approved_date IS NOT NULL
 
     UNION DISTINCT
 
-    SELECT DISTINCT CAST(signoff_date AS DATE) AS full_date
+    SELECT DISTINCT DATE(SAFE_CAST(signoff_date AS TIMESTAMP)) AS full_date
     FROM stg_dob
     WHERE signoff_date IS NOT NULL
 
@@ -78,6 +79,7 @@ date_dimension AS (
         END AS fiscal_year
 
     FROM all_dates
+    WHERE full_date IS NOT NULL
 
 ),
 
@@ -99,10 +101,9 @@ null_placeholder AS (
         CAST(NULL AS INT64) AS day_of_week,
         CAST(NULL AS STRING) AS weekday_name,
         CAST(NULL AS BOOLEAN) AS is_weekend,
-        CAST(NULL AS INT64) AS fiscal_year 
-) 
+        CAST(NULL AS INT64) AS fiscal_year
+)
 -- make sure BQ knows the col types
-
 
 SELECT * FROM date_dimension
 
