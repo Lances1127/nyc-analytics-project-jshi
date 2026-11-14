@@ -16,11 +16,11 @@ stg_litigation AS (
 
 ),
 
--- Collect all dates from both staging models
+-- Collect dates from both staging models
 
 all_dates AS (
 
-    -- 311 Housing Requests: Created Date
+    -- HPD 311: Request Created Date
     SELECT DISTINCT
         CAST(created_date AS DATE) AS full_date
     FROM stg_311
@@ -28,7 +28,7 @@ all_dates AS (
 
     UNION DISTINCT
 
-    -- 311 Housing Requests: Closed Date
+    -- HPD 311: Request Closed Date
     SELECT DISTINCT
         CAST(closed_date AS DATE) AS full_date
     FROM stg_311
@@ -37,21 +37,21 @@ all_dates AS (
     UNION DISTINCT
 
     -- Housing Litigation: Case Open Date
+    -- Renamed to created_date in staging
     SELECT DISTINCT
-        CAST(caseopendate AS DATE) AS full_date
+        CAST(created_date AS DATE) AS full_date
     FROM stg_litigation
-    WHERE caseopendate IS NOT NULL
+    WHERE created_date IS NOT NULL
 
     UNION DISTINCT
 
-    -- Housing Litigation: Finding Date
+    -- Housing Litigation: Harassment Finding Date
     SELECT DISTINCT
-        CAST(findingdate AS DATE) AS full_date
+        CAST(harassment_finding_date AS DATE) AS full_date
     FROM stg_litigation
-    WHERE findingdate IS NOT NULL
+    WHERE harassment_finding_date IS NOT NULL
 
 ),
-
 -- Generate date attributes
 
 date_dimension AS (
