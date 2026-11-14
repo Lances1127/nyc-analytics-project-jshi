@@ -9,7 +9,6 @@ dim_time AS (
 
     SELECT *
     FROM {{ ref('dim_time') }}
-
 ),
 
 fact_data AS (
